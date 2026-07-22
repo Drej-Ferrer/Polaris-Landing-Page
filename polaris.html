@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Polaris — Operations Management Suite</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy: #10193A;
+    --navy-2: #16204A;
+    --paper: #F7F8FB;
+    --white: #FFFFFF;
+    --ink: #10193A;
+    --ink-muted: #667085;
+    --line: #E6E8EF;
+
+    --wm: #2E6FF2;
+    --qm: #14B8A6;
+    --pm: #8B5CF6;
+    --lm: #F5A623;
+
+    --wm-tint: #EAF1FE;
+    --qm-tint: #E7FAF7;
+    --pm-tint: #F2EDFE;
+    --lm-tint: #FEF4E4;
+
+    --display: 'Fredoka', sans-serif;
+    --body: 'Inter', sans-serif;
+    --mono: 'IBM Plex Mono', monospace;
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html{ scroll-behavior: smooth; }
+  body{ background: var(--white); color: var(--ink); font-family: var(--body); -webkit-font-smoothing: antialiased; }
+  a{ color:inherit; text-decoration:none; }
+  :focus-visible{ outline: 2px solid var(--wm); outline-offset: 3px; }
+  ul{ list-style:none; }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
+  }
+
+  .wrap{ max-width: 1200px; margin:0 auto; padding: 0 32px; }
+
+  /* NAV */
+  nav{ position:sticky; top:0; z-index:50; background: rgba(255,255,255,0.9); backdrop-filter: blur(8px); border-bottom:1px solid var(--line); }
+  .nav-inner{ display:flex; align-items:center; justify-content:space-between; padding:16px 32px; max-width:1200px; margin:0 auto; }
+  .brand{ display:flex; align-items:center; gap:9px; }
+  .brand svg{ width:24px; height:24px; }
+  .brand-text{ display:flex; flex-direction:column; line-height:1; }
+  .brand-text .name{ font-family:var(--display); font-weight:600; font-size:19px; color:var(--navy); letter-spacing:0.3px; }
+  .brand-text .sub{ font-family:var(--mono); font-size:7.5px; color:#9AA3B8; letter-spacing:1.2px; margin-top:2px; }
+  .nav-links{ display:flex; gap:34px; }
+  .nav-links a{ color:#4A5470; font-size:14px; font-weight:500; transition: color .2s; }
+  .nav-links a:hover{ color: var(--navy); }
+  .nav-cta{ background: var(--navy); color:#fff; font-size:13.5px; font-weight:600; padding:10px 20px; border-radius:8px; transition: transform .15s, background .2s; }
+  .nav-cta:hover{ background:#1E2B5C; transform: translateY(-1px); }
+
+  /* HERO */
+  .hero{ padding: 90px 32px 70px; background: var(--white); }
+  .hero-grid{ display:grid; grid-template-columns: 1.05fr 0.95fr; gap:56px; align-items:center; max-width:1200px; margin:0 auto; }
+  .eyebrow{ display:inline-flex; align-items:center; gap:8px; font-family:var(--mono); font-size:11px; letter-spacing:2px; color: var(--wm); background: var(--wm-tint); border:1px solid #CFE0FD; padding:7px 14px; border-radius:100px; margin-bottom:26px; }
+  .eyebrow .dot{ width:6px; height:6px; border-radius:50%; background: var(--wm); }
+
+  .hero h1{ font-family:var(--display); font-weight:600; font-size: clamp(38px, 4.6vw, 56px); line-height:1.08; color: var(--navy); }
+  .hero h1 .accent{ color: var(--wm); }
+  .hero p.lead{ font-size:16.5px; line-height:1.7; color: var(--ink-muted); max-width:520px; margin: 22px 0 34px; }
+
+  .hero-ctas{ display:flex; gap:14px; flex-wrap:wrap; margin-bottom:48px; }
+  .btn-primary{ background: var(--navy); color:#fff; font-weight:600; font-size:14.5px; padding:14px 26px; border-radius:9px; transition: transform .15s, box-shadow .2s, background .2s; }
+  .btn-primary:hover{ background:#1E2B5C; transform: translateY(-2px); box-shadow:0 10px 22px rgba(16,25,58,0.22); }
+  .btn-ghost{ border:1px solid var(--line); color: var(--navy); font-weight:600; font-size:14.5px; padding:14px 26px; border-radius:9px; background:#fff; transition: border-color .2s, background .2s; }
+  .btn-ghost:hover{ border-color:#B9C2D6; background:#FAFBFD; }
+
+  .hero-stats{ display:flex; gap:44px; }
+  .stat .num{ font-family:var(--display); font-weight:600; font-size:28px; color:var(--navy); }
+  .stat .lbl{ font-family:var(--mono); font-size:10px; letter-spacing:1px; color:#9AA3B8; margin-top:4px; text-transform:uppercase; }
+
+  /* Dashboard mock */
+  .dash-card{ background:#fff; border:1px solid var(--line); border-radius:16px; box-shadow: 0 30px 60px -20px rgba(16,25,58,0.18); overflow:hidden; }
+  .dash-topbar{ display:flex; align-items:center; gap:10px; padding:12px 16px; background: var(--navy); }
+  .dash-dot{ width:9px; height:9px; border-radius:50%; }
+  .dash-url{ margin-left:6px; background: rgba(255,255,255,0.08); color:#B9C2D6; font-family:var(--mono); font-size:11px; padding:5px 12px; border-radius:6px; flex:1; }
+  .dash-body{ display:grid; grid-template-columns: 46px 1fr; min-height: 380px; }
+  .dash-side{ background: var(--navy); display:flex; flex-direction:column; align-items:center; gap:12px; padding-top:16px; }
+  .dash-side .sq{ width:22px; height:22px; border-radius:6px; }
+  .dash-main{ padding:20px; }
+  .dash-main h4{ font-family:var(--display); font-weight:600; font-size:15px; color:var(--navy); margin-bottom:14px; }
+  .dash-toggle{ display:inline-flex; gap:4px; float:right; margin-top:-30px; }
+  .dash-toggle span{ font-size:10.5px; font-weight:600; padding:5px 10px; border-radius:6px; color:#8A93A8; }
+  .dash-toggle span.active{ background: var(--navy); color:#fff; }
+  .dash-stats{ display:grid; grid-template-columns: repeat(4,1fr); gap:10px; margin: 18px 0 18px; }
+  .dash-stats .cell{ border:1px solid var(--line); border-radius:10px; padding:10px; }
+  .dash-stats .cell .l{ font-family:var(--mono); font-size:8.5px; color:#9AA3B8; letter-spacing:0.5px; }
+  .dash-stats .cell .v{ font-family:var(--display); font-weight:600; font-size:18px; margin-top:4px; }
+  .dash-stats .cell .d{ font-size:9.5px; color:#14B8A6; font-weight:600; margin-top:2px; }
+  .dash-chart{ border:1px solid var(--line); border-radius:10px; padding:14px; margin-bottom:16px; }
+  .dash-chart .l{ font-size:11px; color:#667085; font-weight:600; margin-bottom:8px; }
+  .dash-rows{ display:flex; flex-direction:column; gap:9px; }
+  .dash-row{ display:flex; align-items:center; justify-content:space-between; padding:9px 10px; border:1px solid var(--line); border-radius:8px; font-size:11.5px; }
+  .tag{ font-family:var(--mono); font-size:9.5px; font-weight:600; padding:2px 7px; border-radius:5px; }
+
+  /* SECTION HEADS */
+  .section{ padding: 96px 32px; }
+  .section.tint{ background: var(--paper); }
+  .section-head{ text-align:center; max-width:640px; margin:0 auto 56px; }
+  .section-head .eyebrow-lite{ font-family:var(--mono); font-size:11px; letter-spacing:2.2px; color: var(--wm); text-transform:uppercase; display:block; margin-bottom:14px; font-weight:600; }
+  .section-head h2{ font-family:var(--display); font-weight:600; font-size: clamp(30px,4vw,44px); color: var(--navy); line-height:1.1; }
+  .section-head p{ margin-top:16px; font-size:15.5px; color: var(--ink-muted); line-height:1.65; }
+
+  /* MODULES */
+  .modules-grid{ display:grid; grid-template-columns: repeat(4,1fr); gap:22px; max-width:1200px; margin:0 auto; }
+  .m-card{ position:relative; background:#fff; border:1px solid var(--line); border-radius:16px; padding:26px 22px 24px; transition: transform .2s ease, box-shadow .2s ease; }
+  .m-card:hover{ transform: translateY(-5px); box-shadow: 0 20px 36px rgba(16,25,58,0.08); }
+  .m-num{ position:absolute; top:22px; right:22px; font-family:var(--mono); font-size:11px; color:#C7CCDA; font-weight:600; }
+  .m-icon{ width:46px; height:46px; border-radius:11px; display:flex; align-items:center; justify-content:center; background: var(--t); margin-bottom:16px; }
+  .m-icon svg{ width:24px; height:24px; stroke: var(--c); }
+  .m-badge{ display:inline-block; font-family:var(--mono); font-size:11px; font-weight:600; color: var(--c); background: var(--t); border:1px solid var(--c); border-radius:6px; padding:3px 9px; margin-bottom:12px; }
+  .m-name{ font-family:var(--display); font-weight:600; font-size:18px; color:var(--navy); }
+  .m-sub{ font-size:12.5px; color: var(--ink-muted); margin-top:2px; margin-bottom:16px; }
+  .m-list{ display:flex; flex-direction:column; gap:10px; }
+  .m-list li{ display:flex; align-items:flex-start; gap:8px; font-size:13px; line-height:1.5; color:#333B49; }
+  .m-list li svg{ width:15px; height:15px; flex-shrink:0; margin-top:2px; stroke: var(--c); }
+
+  .flow-pill{ display:flex; align-items:center; justify-content:center; gap:10px; max-width:520px; margin: 44px auto 0; border:1px solid var(--line); background:#fff; border-radius:100px; padding:13px 26px; font-size:13.5px; }
+  .flow-pill .ic{ width:18px; height:18px; color: var(--wm); display:flex; }
+  .flow-pill strong{ font-family:var(--mono); font-size:11px; letter-spacing:1.2px; color:var(--navy); }
+  .flow-pill span.sep{ color:#C7CCDA; }
+  .flow-pill span.desc{ color: var(--ink-muted); }
+
+  /* HOW IT WORKS */
+  .how-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:64px; align-items:center; max-width:1200px; margin:0 auto; }
+  .how-left .eyebrow-lite{ font-family:var(--mono); font-size:11px; letter-spacing:2.2px; color: var(--pm); text-transform:uppercase; font-weight:600; display:block; margin-bottom:14px; }
+  .how-left h2{ font-family:var(--display); font-weight:600; font-size: clamp(30px,3.6vw,42px); color:var(--navy); line-height:1.12; margin-bottom:18px; }
+  .how-left > p{ font-size:15px; color: var(--ink-muted); line-height:1.7; max-width:460px; margin-bottom:34px; }
+  .steps{ display:flex; flex-direction:column; gap:24px; }
+  .step{ display:flex; gap:16px; }
+  .step .n{ flex-shrink:0; width:34px; height:34px; border-radius:9px; background: var(--paper); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; font-family:var(--mono); font-size:11.5px; font-weight:600; color: var(--navy); }
+  .step h5{ font-family:var(--display); font-weight:600; font-size:15.5px; color:var(--navy); margin-bottom:4px; }
+  .step p{ font-size:13.5px; color: var(--ink-muted); line-height:1.55; }
+
+  .pipeline{ background:#fff; border:1px solid var(--line); border-radius:16px; padding:22px; box-shadow: 0 24px 50px -18px rgba(16,25,58,0.14); }
+  .pipe-item{ display:flex; align-items:center; gap:14px; border:1px solid var(--line); border-radius:11px; padding:14px 16px; }
+  .pipe-item .ic{ width:38px; height:38px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-family:var(--mono); font-weight:700; font-size:11px; color: var(--c); background: var(--t); }
+  .pipe-item .tx{ flex:1; }
+  .pipe-item .tx .t1{ font-family:var(--display); font-weight:600; font-size:14px; color:var(--navy); }
+  .pipe-item .tx .t2{ font-size:11.5px; color: var(--ink-muted); }
+  .pipe-item .status{ width:8px; height:8px; border-radius:50%; background:#14B8A6; box-shadow: 0 0 0 3px #E7FAF7; }
+  .pipe-arrow{ display:flex; justify-content:center; padding:8px 0; color:#C7CCDA; }
+  .pipe-arrow svg{ width:16px; height:16px; }
+  .pipe-footer{ margin-top:14px; text-align:center; background: var(--paper); border:1px solid var(--line); border-radius:10px; padding:12px; font-family:var(--mono); font-size:11px; letter-spacing:1px; color: var(--navy); font-weight:600; }
+  .pipe-footer span{ font-family:var(--body); font-weight:400; letter-spacing:0; color: var(--ink-muted); margin-left:8px; }
+
+  /* DEMO FORM CTA */
+  .demo-section{ background: var(--paper); padding: 100px 32px; border-top:1px solid var(--line); }
+  .demo-grid{ max-width:1200px; margin:0 auto; display:grid; grid-template-columns: 1fr 1fr; gap:70px; align-items:center; }
+
+  .demo-eyebrow{ display:inline-flex; align-items:center; gap:8px; font-family:var(--mono); font-size:11px; letter-spacing:2px; color:#0FA8B8; background: rgba(31,215,232,0.12); border:1px solid rgba(31,215,232,0.35); padding:7px 14px; border-radius:100px; margin-bottom:24px; }
+  .demo-eyebrow .dot{ width:6px; height:6px; border-radius:50%; background: #1FD7E8; }
+
+  .demo-left h2{ font-family:var(--display); font-weight:600; font-size: clamp(30px,3.8vw,44px); color: var(--navy); line-height:1.12; margin-bottom:18px; }
+  .demo-left > p{ font-size:15.5px; color: var(--ink-muted); line-height:1.7; max-width:460px; margin-bottom:34px; }
+
+  .demo-checklist{ display:flex; flex-direction:column; gap:16px; }
+  .demo-checklist li{ display:flex; align-items:flex-start; gap:12px; font-size:14.5px; color:#333B49; line-height:1.5; }
+  .demo-checklist .check-ic{ flex-shrink:0; width:22px; height:22px; border-radius:50%; background: rgba(31,215,232,0.12); border:1px solid rgba(31,215,232,0.35); display:flex; align-items:center; justify-content:center; margin-top:1px; }
+  .demo-checklist .check-ic svg{ width:12px; height:12px; stroke: #0FA8B8; }
+
+  .demo-card{ background: #fff; border:1px solid var(--line); border-radius:18px; padding:34px; box-shadow: 0 30px 60px -20px rgba(16,25,58,0.14); }
+  .demo-form-row{ display:grid; grid-template-columns: 1fr 1fr; gap:14px; margin-bottom:14px; }
+  .demo-field{ display:flex; flex-direction:column; gap:7px; margin-bottom:14px; }
+  .demo-field label{ font-size:12.5px; font-weight:600; color: var(--ink-muted); }
+  .demo-field input,
+  .demo-field textarea{
+    background: var(--paper);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 14px;
+    padding: 12px 14px;
+    border-radius: 9px;
+    width: 100%;
+    transition: border-color .2s, box-shadow .2s, background .2s;
+  }
+  .demo-field input::placeholder,
+  .demo-field textarea::placeholder{ color:#9AA3B8; }
+  .demo-field input:focus,
+  .demo-field textarea:focus{
+    outline: none;
+    background: #fff;
+    border-color: #1FD7E8;
+    box-shadow: 0 0 0 3px rgba(31,215,232,0.18);
+  }
+  .demo-field textarea{ resize: vertical; min-height: 96px; font-family: var(--body); }
+
+  .demo-submit{
+    width:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:9px;
+    background: #1FD7E8;
+    color: var(--navy);
+    font-weight:700;
+    font-size:15px;
+    padding:15px 22px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    margin-top:6px;
+    transition: transform .15s ease, box-shadow .2s ease, background .2s ease;
+  }
+  .demo-submit:hover{ background:#3EE3F1; transform: translateY(-2px); box-shadow: 0 14px 28px rgba(31,215,232,0.3); }
+  .demo-submit svg{ width:17px; height:17px; }
+
+  @media (max-width: 760px){
+    .demo-form-row{ grid-template-columns: 1fr; gap:0; }
+  }
+
+  /* FOOTER */
+  footer{ background: var(--navy); color:#8394B4; padding: 36px 32px; border-top:1px solid rgba(255,255,255,0.08); }
+  .footer-inner{ max-width:1200px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; }
+  .footer-inner .fbrand{ display:flex; align-items:center; gap:8px; color:#fff; font-family:var(--display); font-weight:600; font-size:15px; }
+  .footer-inner .fbrand svg{ width:17px; height:17px; }
+  .footer-links{ display:flex; gap:26px; font-family:var(--mono); font-size:11px; letter-spacing:1px; }
+  .footer-links a{ color:#8394B4; transition: color .2s; }
+  .footer-links a:hover{ color:#fff; }
+  footer .fine{ font-size:12px; }
+
+  @media (max-width: 1020px){
+    .hero-grid{ grid-template-columns:1fr; }
+    .modules-grid{ grid-template-columns: 1fr 1fr; }
+    .how-grid{ grid-template-columns:1fr; }
+    .demo-grid{ grid-template-columns:1fr; gap:48px; }
+    .nav-links{ display:none; }
+  }
+  @media (max-width: 600px){
+    .modules-grid{ grid-template-columns:1fr; }
+    .hero{ padding:70px 20px 50px; }
+    .section{ padding:64px 20px; }
+    .demo-section{ padding:64px 20px; }
+    .hero-stats{ gap:28px; flex-wrap:wrap; }
+    .footer-links{ display:none; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="brand">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 1L14.5 9.5L23 12L14.5 14.5L12 23L9.5 14.5L1 12L9.5 9.5L12 1Z" fill="#2E6FF2"/></svg>
+      <div class="brand-text">
+        <span class="name">POLARIS</span>
+        <span class="sub">OPERATIONS MANAGEMENT SUITE</span>
+      </div>
+    </div>
+    <div class="nav-links">
+      <a href="#">Features</a>
+      <a href="#modules">Modules</a>
+      <a href="#">Integrations</a>
+      <a href="#">Pricing</a>
+      <a href="#">About</a>
+    </div>
+    <a href="#demo-form" class="nav-cta">Request a Demo</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-grid">
+    <div>
+      <span class="eyebrow"><span class="dot"></span>OPERATIONS MANAGEMENT SUITE</span>
+      <h1>Streamline Your <span class="accent">Operations</span> with Polaris</h1>
+      <p class="lead">One connected platform for Warehouse, Quality, Production, and Logistics — built for enterprise operations teams that demand precision and full visibility.</p>
+      <div class="hero-ctas">
+        <a href="#demo-form" class="btn-primary">Request a Demo</a>
+        <a href="#modules" class="btn-ghost">View the Modules →</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><div class="num">4</div><div class="lbl">Core Modules</div></div>
+        <div class="stat"><div class="num">99.9%</div><div class="lbl">Uptime SLA</div></div>
+        <div class="stat"><div class="num">&lt;1 day</div><div class="lbl">Onboarding</div></div>
+      </div>
+    </div>
+
+    <div class="dash-card">
+      <div class="dash-topbar">
+        <div class="dash-dot" style="background:#FF5F57;"></div>
+        <div class="dash-dot" style="background:#FEBC2E;"></div>
+        <div class="dash-dot" style="background:#28C840;"></div>
+        <div class="dash-url">app.polaris.techignite.com</div>
+      </div>
+      <div class="dash-body">
+        <div class="dash-side">
+          <div class="sq" style="background:#2E6FF2;"></div>
+          <div class="sq" style="background:#14B8A6;"></div>
+          <div class="sq" style="background:#8B5CF6;"></div>
+          <div class="sq" style="background:#F5A623;"></div>
+        </div>
+        <div class="dash-main">
+          <h4>Operations Overview</h4>
+          <div class="dash-toggle"><span class="active">Today</span><span>Week</span><span>Month</span></div>
+          <div class="dash-stats">
+            <div class="cell"><div class="l">WM ORDERS</div><div class="v" style="color:#2E6FF2;">1,284</div><div class="d">+12%</div></div>
+            <div class="cell"><div class="l">QC PASS RATE</div><div class="v" style="color:#14B8A6;">97.3%</div><div class="d">+2.1%</div></div>
+            <div class="cell"><div class="l">PRODUCTION</div><div class="v" style="color:#8B5CF6;">842</div><div class="d">+8%</div></div>
+            <div class="cell"><div class="l">DELIVERED</div><div class="v" style="color:#F5A623;">1,156</div><div class="d">+15%</div></div>
+          </div>
+          <div class="dash-chart">
+            <div class="l">Operations Flow — Last 7 days</div>
+            <svg viewBox="0 0 320 70" width="100%" height="70" preserveAspectRatio="none">
+              <polyline points="0,40 45,25 90,45 135,20 180,32 225,15 270,22 320,10" fill="none" stroke="#2E6FF2" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="45" cy="25" r="3" fill="#2E6FF2"/>
+              <circle cx="135" cy="20" r="3" fill="#2E6FF2"/>
+              <circle cx="225" cy="15" r="3" fill="#2E6FF2"/>
+              <circle cx="320" cy="10" r="3" fill="#2E6FF2"/>
+            </svg>
+          </div>
+          <div class="dash-rows">
+            <div class="dash-row"><span>WO-0042</span><span class="tag" style="color:#2E6FF2; background:#EAF1FE;">WM</span><span style="color:#14B8A6; font-weight:600;">Active</span></div>
+            <div class="dash-row"><span>QC-0198</span><span class="tag" style="color:#14B8A6; background:#E7FAF7;">QM</span><span style="color:#14B8A6; font-weight:600;">Passed</span></div>
+            <div class="dash-row"><span>PO-0317</span><span class="tag" style="color:#8B5CF6; background:#F2EDFE;">PM</span><span style="color:#F5A623; font-weight:600;">In Progress</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- CORE MODULES -->
+<section class="section" id="modules">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow-lite">The Core Modules</span>
+      <h2>Four Modules. One Connected Flow.</h2>
+      <p>Each module is purpose-built for its domain — and seamlessly connected to the others through a single unified data pipeline.</p>
+    </div>
+
+    <div class="modules-grid">
+
+      <div class="m-card" style="--c:#2E6FF2; --t:#EAF1FE;">
+        <div class="m-num">01</div>
+        <div class="m-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 4l9 6.5"/><path d="M5 9.5V20h14V9.5"/><path d="M9 20v-6h6v6"/></svg></div>
+        <div class="m-badge">Polaris WM</div>
+        <div class="m-name">Warehouse Management</div>
+        <div class="m-sub">End-to-end inventory control</div>
+        <ul class="m-list">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/></svg>Inbound receiving, SKU tagging &amp; putaway</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/></svg>Bin management &amp; FIFO pick / ship</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/></svg>Real-time scanner connectivity</li>
+        </ul>
+      </div>
+
+      <div class="m-card" style="--c:#14B8A6; --t:#E7FAF7;">
+        <div class="m-num">02</div>
+        <div class="m-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><path d="m9 12 2 2 4-4"/></svg></div>
+        <div class="m-badge">Polaris QM</div>
+        <div class="m-name">Quality Management</div>
+        <div class="m-sub">Built-in quality at every step</div>
+        <ul class="m-list">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/></svg>Incoming inspections before delivery</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/></svg>Quality hold &amp; one-click release</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/></svg>Auditable checklist by task &amp; quality</li>
+        </ul>
+      </div>
+
+      <div class="m-card" style="--c:#8B5CF6; --t:#F2EDFE;">
+        <div class="m-num">03</div>
+        <div class="m-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18"/><path d="M8 4v3M16 4v3"/></svg></div>
+        <div class="m-badge">Polaris PM</div>
+        <div class="m-name">Production Management</div>
+        <div class="m-sub">Precision scheduling &amp; execution</div>
+        <ul class="m-list">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/></svg>Scheduling &amp; production planning</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/></svg>QM parameter setup for work orders</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/></svg>Proactive escalation &amp; tracking</li>
+        </ul>
+      </div>
+
+      <div class="m-card" style="--c:#F5A623; --t:#FEF4E4;">
+        <div class="m-num">04</div>
+        <div class="m-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 14h13V6H1v8z"/><path d="M14 9h4l3 3v2h-7V9z"/><circle cx="5.5" cy="17.5" r="1.8"/><circle cx="17.5" cy="17.5" r="1.8"/></svg></div>
+        <div class="m-badge">Polaris LM</div>
+        <div class="m-name">Logistics Management</div>
+        <div class="m-sub">Delivery intelligence &amp; tracking</div>
+        <ul class="m-list">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/></svg>Trip scheduling &amp; route assignment</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/></svg>Real-time delivery status tracking</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/></svg>Expense reporting &amp; WMS integration</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="flow-pill">
+      <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/></svg></span>
+      <strong>CONNECTED FLOW</strong>
+      <span class="sep">|</span>
+      <span class="desc">One unified operations workflow across all modules</span>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section tint">
+  <div class="how-grid">
+    <div class="how-left">
+      <span class="eyebrow-lite">How It Works</span>
+      <h2>Operations intelligence, end to end</h2>
+      <p>Polaris connects every stage — from the moment goods arrive in your warehouse to the final delivery — giving your team complete visibility and control.</p>
+      <div class="steps">
+        <div class="step">
+          <div class="n">01</div>
+          <div><h5>Receive &amp; Store</h5><p>WM handles all inbound logistics, putaway, and inventory with scanner connectivity.</p></div>
+        </div>
+        <div class="step">
+          <div class="n">02</div>
+          <div><h5>Inspect &amp; Approve</h5><p>QM runs quality checks and sign-offs before goods move to production.</p></div>
+        </div>
+        <div class="step">
+          <div class="n">03</div>
+          <div><h5>Produce &amp; Schedule</h5><p>PM schedules work orders against real inventory and QM clearances.</p></div>
+        </div>
+        <div class="step">
+          <div class="n">04</div>
+          <div><h5>Deliver &amp; Track</h5><p>LM manages routes, trips, and returns with full expense reporting.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pipeline">
+      <div class="pipe-item">
+        <div class="ic" style="--c:#2E6FF2; color:#2E6FF2; background:#EAF1FE;">WM</div>
+        <div class="tx"><div class="t1">Polaris WM</div><div class="t2">Warehouse Management</div></div>
+        <div class="status"></div>
+      </div>
+      <div class="pipe-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg></div>
+      <div class="pipe-item">
+        <div class="ic" style="color:#14B8A6; background:#E7FAF7;">QM</div>
+        <div class="tx"><div class="t1">Polaris QM</div><div class="t2">Quality Management</div></div>
+        <div class="status"></div>
+      </div>
+      <div class="pipe-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg></div>
+      <div class="pipe-item">
+        <div class="ic" style="color:#8B5CF6; background:#F2EDFE;">PM</div>
+        <div class="tx"><div class="t1">Polaris PM</div><div class="t2">Production Management</div></div>
+        <div class="status"></div>
+      </div>
+      <div class="pipe-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg></div>
+      <div class="pipe-item">
+        <div class="ic" style="color:#F5A623; background:#FEF4E4;">LM</div>
+        <div class="tx"><div class="t1">Polaris LM</div><div class="t2">Logistics Management</div></div>
+        <div class="status"></div>
+      </div>
+      <div class="pipe-footer">CONNECTED FLOW <span>Unified data pipeline</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- REQUEST A DEMO -->
+<section class="demo-section" id="demo-form">
+  <div class="demo-grid">
+
+    <div class="demo-left">
+      <span class="demo-eyebrow"><span class="dot"></span>GET STARTED</span>
+      <h2>Request a personalized demo</h2>
+      <p>See how Polaris unifies your operations. A TechIgnite specialist will walk your team through the modules that matter most to you.</p>
+
+      <ul class="demo-checklist">
+        <li>
+          <span class="check-ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg></span>
+          Tailored to your industry and scale
+        </li>
+        <li>
+          <span class="check-ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg></span>
+          No commitment — 30-minute walkthrough
+        </li>
+        <li>
+          <span class="check-ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg></span>
+          Talk to a real operations engineer
+        </li>
+      </ul>
+    </div>
+
+    <div class="demo-card">
+      <form onsubmit="return false;">
+        <div class="demo-form-row">
+          <div class="demo-field">
+            <label for="demo-name">Full name</label>
+            <input id="demo-name" type="text" name="name" placeholder="Jane Cooper" required>
+          </div>
+          <div class="demo-field">
+            <label for="demo-company">Company</label>
+            <input id="demo-company" type="text" name="company" placeholder="Acme Industries" required>
+          </div>
+        </div>
+
+        <div class="demo-field">
+          <label for="demo-email">Work email</label>
+          <input id="demo-email" type="email" name="email" placeholder="jane@company.com" required>
+        </div>
+
+        <div class="demo-field">
+          <label for="demo-message">What would you like to see?</label>
+          <textarea id="demo-message" name="message" placeholder="Tell us about your operations and which modules interest you most..."></textarea>
+        </div>
+
+        <button type="submit" class="demo-submit">
+          Request a Demo
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
+      </form>
+    </div>
+
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="fbrand">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 1L14.5 9.5L23 12L14.5 14.5L12 23L9.5 14.5L1 12L9.5 9.5L12 1Z" fill="#fff"/></svg>
+      POLARIS
+    </div>
+    <div class="footer-links">
+      <a href="#">POLARIS WM</a>
+      <a href="#">POLARIS QM</a>
+      <a href="#">POLARIS PM</a>
+      <a href="#">POLARIS LM</a>
+    </div>
+    <div class="fine">© 2026 TechIgnite. All rights reserved.</div>
+  </div>
+</footer>
+
+</body>
+</html>
